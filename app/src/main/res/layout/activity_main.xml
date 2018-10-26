@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <FrameLayout
+        android:id="@+id/framel"
+        android:background="#008800"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/cameraview"
+                android:layout_width="1248px"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:background="#008800" />
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="165dp"
+                android:layout_height="120dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="0dp"
+                android:layout_toRightOf="@+id/cameraview"
+                android:background="#22aadd"
+                android:text="智能小车IP:" />
+
+            <EditText
+                android:id="@+id/inputIp"
+                android:layout_width="123dp"
+                android:layout_height="20dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="5dp"
+                android:layout_alignParentEnd="true"
+                android:background="#22aadd" />
+
+
+            <Button
+                android:id="@+id/snapImageButton"
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/inputButton"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="51dp"
+                android:layout_marginEnd="0dp"
+                android:text="拍照" />
+
+            <Button
+                android:id="@+id/inputButton"
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="28dp"
+                android:layout_marginEnd="0dp"
+                android:text="启动连接" />
+        </RelativeLayout>
+    </FrameLayout>
+</android.support.constraint.ConstraintLayout>
