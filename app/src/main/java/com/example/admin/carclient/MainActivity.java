@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private final static Double PI = 3.14159;
     private final static Double toAnglle = 57.297;
     private final static int BUFFER_SIZE = 1024 * 1024;
+    private final static String defaultIp = "192.168.43.188";
 
     private ImageView imageView;
     private EditText editText;
@@ -266,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
         imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         cmdData = new byte[3];
-        editText.setText("172.21.80.98");
+        editText.setText(defaultIp);
 
         imageDispBuffer = new byte[BUFFER_SIZE];
 
@@ -433,6 +434,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     if (isSocketLink && socket.isConnected()) {
+                        Log.i(TAG, "isSocketLink && socket.isConnected()");
                         if (ins == null || outs == null) {
                             inputButton.setText("连接到智能小车");
                             ins = socket.getInputStream();
@@ -483,11 +485,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
-                    try {
-                        socket.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
                     isSocketLink = false;
                     e.printStackTrace();
                 }

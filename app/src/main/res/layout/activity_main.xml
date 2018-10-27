@@ -26,7 +26,7 @@
 
             <TextView
                 android:id="@+id/statusText"
-                android:layout_width="165dp"
+                android:layout_width="145dp"
                 android:layout_height="120dp"
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="2dp"
@@ -37,7 +37,7 @@
 
             <EditText
                 android:id="@+id/inputIp"
-                android:layout_width="123dp"
+                android:layout_width="140dp"
                 android:layout_height="20dp"
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="5dp"
@@ -47,7 +47,7 @@
 
             <Button
                 android:id="@+id/snapImageButton"
-                android:layout_width="125dp"
+                android:layout_width="145dp"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@+id/inputButton"
                 android:layout_alignParentEnd="true"
@@ -57,7 +57,7 @@
 
             <Button
                 android:id="@+id/inputButton"
-                android:layout_width="125dp"
+                android:layout_width="145dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
