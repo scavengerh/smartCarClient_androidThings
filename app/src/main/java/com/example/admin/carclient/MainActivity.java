@@ -50,7 +50,7 @@ import java.util.Enumeration;
 import static android.graphics.BitmapFactory.decodeFile;
 import static android.graphics.BitmapFactory.decodeStream;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener{
     private String TAG = this.getClass().getSimpleName();
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -67,10 +67,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView textView;
     private Button inputButton;
     private Button snapButton;
+
+    private Button carUp;
+    private Button carDown;
+    private Button carLeft;
+    private Button carRight;
+
     private FrameLayout frameLayout;
-    private final int angleX = 1840;
-    private final int angleY = 650;
-    private final int angleR = 250;
     private int imageWidth;
     private int imageStartX;
     private int imageHeight;
@@ -86,10 +89,9 @@ public class MainActivity extends AppCompatActivity {
     private int screenWidth;
     private int screenHeight;
 
-    private double angle;
+
     private boolean isTouchWheel = false;
     boolean isTouchImage = false;
-    private MyView myView = null;
 
 
     private boolean motorCmdSendFlags = false;
@@ -213,10 +215,6 @@ public class MainActivity extends AppCompatActivity {
         verifyStoragePermissions(this);
 
         frameLayout = (FrameLayout) findViewById(R.id.framel);
-        myView = new MyView(MainActivity.this);
-        myView.setCircle(angleX, angleY, angleR);
-        this.angle = 90;
-        frameLayout.addView(myView);
         imageView = (ImageView) findViewById(R.id.cameraview);
         imageView.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -236,34 +234,13 @@ public class MainActivity extends AppCompatActivity {
         inputButton = (Button) findViewById(R.id.inputButton);
         snapButton = (Button) findViewById(R.id.snapImageButton);
 
+        carUp = (Button)findViewById(R.id.carUp);
+        carDown = (Button)findViewById(R.id.carDown);
+        carLeft = (Button)findViewById(R.id.carLeft);
+        carRight = (Button)findViewById(R.id.carRight);
+
 //        textView.setText("    操作说明： 输入智能小车IP，点击<启动连接>连接到智能小车，点击<拍照>捕捉当前视频，" +
 //                "在圆形区域拖动方向控制智能小车行走，在视频监控区域上下滑动控制监控相机姿态。");
-        snapButton.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.snapImageButton:
-                        isSnapFlags  =true;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-
-        inputButton.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.inputButton:
-                        // Log.i(TAG, "Connect server button press down");
-                        isInput = true;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
 
         imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         cmdData = new byte[3];
@@ -305,21 +282,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if (Math.sqrt(Math.pow(angleX - event.getX(), 2) + Math.pow(angleY - event.getY(), 2)) < angleR) {
-                            //在圆形区域，说明是智能小车方向事件。
-                            //角度是-90 - 270度
-                            if ((angleX - event.getX()) > 0) {
-                                angle = 180 + toAnglle * Math.atan((double) (angleY - event.getY()) / (angleX - event.getX()));
-                            } else {
-                                angle = toAnglle * Math.atan((double) (angleY - event.getY()) / (angleX - event.getX()));
-                            }
-                            isTouchWheel = true;
-                            motorCmdSendFlags = true;
-                            cmdData[0] = 0x10;
-                            cmdData[1] = (byte) ((angle + 90) / 10); // 顺时针 0 - 360度
-                            //Log.i(TAG, "calc angle: " + angle);
-                            myView.invalidate();
-                        } else if (event.getX() < imageWidth && event.getY() < imageHeight) {
+                        if (event.getX() < imageWidth && event.getY() < imageHeight) {
                             //在视频显示区域，说明是摄像头姿态调整事件。
                             if (isTouchImage) {
                                 float moveX = DownX - event.getX();
@@ -349,10 +312,6 @@ public class MainActivity extends AppCompatActivity {
 //                                oldMoveY = 0;
                             isTouchImage = false;
                         }
-                        if (isTouchWheel) {
-                            isTouchWheel = false;
-                            myView.invalidate();
-                        }
 
                         //结束触摸，发送电机停止事件到智能小车。
                         motorCmdSendFlags = true;
@@ -368,6 +327,56 @@ public class MainActivity extends AppCompatActivity {
         });
 
         new Thread(runnable).start();
+    }
+
+
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        switch (view.getId()) {
+            case R.id.inputButton:
+                // Log.i(TAG, "Connect server button press down");
+                isInput = true;
+                break;
+            case R.id.snapImageButton:
+                isSnapFlags = true;
+                break;
+            case R.id.carUp:
+                motorCmdSendFlags = true;
+                cmdData[0] = 0x10;
+                if (event.getAction() == MotionEvent.ACTION_BUTTON_PRESS)
+                    cmdData[1] = 0x10;
+                else if (event.getAction() == MotionEvent.ACTION_BUTTON_RELEASE)
+                    cmdData[1] = 0x50;
+                break;
+            case R.id.carDown:
+                motorCmdSendFlags = true;
+                cmdData[0] = 0x10;
+                if (event.getAction() == MotionEvent.ACTION_BUTTON_PRESS)
+                    cmdData[1] = 0x20;
+                else if (event.getAction() == MotionEvent.ACTION_BUTTON_RELEASE)
+                    cmdData[1] = 0x50;
+                break;
+            case R.id.carLeft:
+                motorCmdSendFlags = true;
+                cmdData[0] = 0x10;
+                if (event.getAction() == MotionEvent.ACTION_BUTTON_PRESS)
+                    cmdData[1] = 0x30;
+                else if (event.getAction() == MotionEvent.ACTION_BUTTON_RELEASE)
+                    cmdData[1] = 0x50;
+                break;
+            case R.id.carRight:
+                motorCmdSendFlags = true;
+                cmdData[0] = 0x10;
+                if (event.getAction() == MotionEvent.ACTION_BUTTON_PRESS)
+                    cmdData[1] = 0x40;
+                else if (event.getAction() == MotionEvent.ACTION_BUTTON_RELEASE)
+                    cmdData[1] = 0x50;
+                break;
+            default:
+                break;
+        }
+
+        return  false;
     }
 
 
@@ -525,57 +534,6 @@ public class MainActivity extends AppCompatActivity {
         return hostIp;
 
     }
-
-    class MyView extends View {
-        private int mCx, mCy, mR;
-
-        public MyView(Context context) {
-            super(context);
-        }
-
-        public void setCircle(int x, int y, int R) {
-            this.mCx = x;
-            this.mCy = y;
-            this.mR = R;
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            // TODO Auto-generated method stub
-
-            Paint paint = new Paint();
-            paint.setColor(Color.GREEN);
-            //让画出的图形是空心的
-            paint.setStyle(Paint.Style.STROKE);
-            //设置画出的线的 粗细程度
-            paint.setStrokeWidth(15);
-            //画出一根线
-            if (isTouchWheel) {
-                float endX = (float) (mCx + mR * Math.cos((double) angle * PI / 180));
-                float endY = (float) (mCy + mR * Math.sin((double) angle * PI / 180));
-                canvas.drawLine(endX,endY , mCx, mCy, paint);
-                //Draw Triangular
-                int mTriangularR =60;
-                float mTriangularX1 = (float) (endX + mTriangularR * Math.cos((double) (180 + angle -20) * PI / 180));
-                float mTriangularY1 = (float) (endY + mTriangularR * Math.sin((double) (180 + angle -20) * PI / 180));
-                float mTriangularX2 = (float) (endX + mTriangularR * Math.cos((double) (180 + angle +20) * PI / 180));
-                float mTriangularY2 = (float) (endY + mTriangularR * Math.sin((double) (180 + angle +20) * PI / 180));
-                canvas.drawLine(endX,endY , mTriangularX1, mTriangularY1, paint);
-                canvas.drawLine(endX,endY , mTriangularX2, mTriangularY2, paint);
-                canvas.drawLine(mTriangularX1, mTriangularY1 , mTriangularX2, mTriangularY2, paint);
-            }
-            //画矩形
-//            canvas.drawRect(200, 500, 300, 300, paint);
-
-            //画圆
-            paint.setStrokeWidth(5);
-            paint.setColor(Color.BLUE);
-            canvas.drawCircle(mCx, mCy, mR, paint);
-
-            super.onDraw(canvas);
-        }
-    }
-
 }
 
 
